@@ -9,7 +9,7 @@ module.exports = {
   /**
    * The fully qualified domain + path that Nucleus is being hosted at
    */
-  baseURL: 'http://localhost:8888',
+  baseURL: 'http://162.1.1.69:8888',
 
   /**
    * The data store to use when persisting plugins and versions.Current possible values
@@ -53,7 +53,7 @@ module.exports = {
    */
   local: {
     root: path.resolve(__dirname, './data/.file'),
-    staticUrl: 'http://localhost:9999',
+    staticUrl: 'http://162.1.1.69:9999',
     port: 9999
   },
 
@@ -212,6 +212,7 @@ r9X3ea0hbKrHfZMI52lbK5XE4Wf8/WYxxxhxJhnVvwz1s4V8CgyR1dkBDdoWO2ND
 u5+xxggzpK9/YfGYeidj053CEbQ93gLF4mpuKtlCiQjcqOiyXD3pq0wEkrs8Xf2F
 IaXPeb3e0Bykm+E=
 =AHRL
+
 -----END PGP PUBLIC KEY BLOCK-----
 -----BEGIN PGP PRIVATE KEY BLOCK-----
 
@@ -293,6 +294,7 @@ Bd3REVIGocwQ6/2MCzE2GwoZx9z7Wq/V93mtIWyqx32TCOdpWyuVxOFn/P1mMccY
 cSYZ1b8M9bOFfAoMkdXZAQ3aFjtjQ7ufscYIM6Svf2HxmHonY9OdwhG0Pd4CxeJq
 birZQokI3Kjoslw96atMBJK7PF39hSGlz3m93tAcpJvh
 =ihK/
+
 -----END PGP PRIVATE KEY BLOCK-----
 `,
 
