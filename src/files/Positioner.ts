@@ -7,11 +7,13 @@ import { initializeAptRepo, addFileToAptRepo } from './utils/apt';
 import { initializeYumRepo, addFileToYumRepo } from './utils/yum';
 import { updateDarwinReleasesFiles } from './utils/darwin';
 import { updateWin32ReleasesFiles } from './utils/win32';
+import { updateLinuxReleasesFiles } from './utils/linux';
 
 const hat = require('hat');
 
 const VALID_WINDOWS_SUFFIX = ['-full.nupkg', '-delta.nupkg', '.exe', '.msi'];
 const VALID_DARWIN_SUFFIX = ['.dmg', '.zip', '.pkg'];
+const VALID_LINUX_SUFFIX = ['.deb'];
 const CIPHER_MODE = 'aes-256-ctr';
 
 const d = debug('nucleus:positioner');
@@ -232,14 +234,25 @@ export default class Positioner {
     file,
     fileData,
   }: HandlePlatformUploadOpts) {
-    if (file.fileName.endsWith('.rpm')) {
-      d('Adding rpm file to yum repo');
-      await addFileToYumRepo(this.store, { app, channel, file, fileData, internalVersion });
-    } else if (file.fileName.endsWith('.deb')) {
-      d('Adding deb file to apt repo');
-      await addFileToAptRepo(this.store, { app, channel, file, fileData, internalVersion });
-    } else {
-      console.warn('Will not upload unknown linux file');
+    // if (file.fileName.endsWith('.rpm')) {
+    //   d('Adding rpm file to yum repo');
+    //   await addFileToYumRepo(this.store, { app, channel, file, fileData, internalVersion });
+    // } else if (file.fileName.endsWith('.deb')) {
+    //   d('Adding deb file to apt repo');
+    //   await addFileToAptRepo(this.store, { app, channel, file, fileData, internalVersion });
+    // } else {
+    //   console.warn('Will not upload unknown linux file');
+    // }
+    const root = path.posix.join(app.slug, channel.id, 'linux', file.arch);
+    const fileKey = path.posix.join(root, file.fileName);
+    if (!VALID_LINUX_SUFFIX.some(suffix => file.fileName.endsWith(suffix))) {
+      d(`Attempted to upload a file for linux but it had an invalid suffix: ${file.fileName}`);
+      return;
+    }
+
+    if (await this.store.putFile(fileKey, fileData)) {
+      d('Pushed a zip file to the file store so updating release information in RELEASES.json');
+      await updateLinuxReleasesFiles({ app, channel, arch: file.arch, store: this.store });
     }
   }
 
