@@ -42,9 +42,7 @@ jobs:
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     - name: Build Docker Image
-      run: |
-        cd apps/meteor/.docker
-        docker build -t lucksoft/update-server:${VERSION} .
+      run: docker build -t lucksoft/update-server:${VERSION} .
 
     - name: Login to DockerHub
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
