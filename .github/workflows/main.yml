@@ -1,18 +1,41 @@
 name: Node.js CI
 
-on:
+on:  
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tag:
+        description: 'tag'
+        required: false
+        type: string
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        arch: [x64]
+        
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
-        repository: 'lucksoft-yungui/chat-server'
+          fetch-depth: 0
+    - name: check out tag
+      if: ${{ inputs.tag }}
+      run: git checkout tags/${{ inputs.tag }}
         
     - name: Extract branch name
       shell: bash
