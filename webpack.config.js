@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
