@@ -138,30 +138,6 @@ d('Setting up server');
     d(err);
     return;
   }
-  d('Checking GPG key');
-  if (!await isGpgKeyValid()) {
-    d('Bad gpg key, invalid');
-    console.error('GPG key is invalid or missing, you must provide "config.gpgSigningKey"'.red);
-    process.exit(1);
-  }
-  if (!gpgSigningKey.includes('-----BEGIN PGP PUBLIC KEY BLOCK-----')) {
-    d('Bad gpg key, no public key');
-    console.error('GPG key does not contain a public key, you must include both the public and private key in "config.gpgSigningKey"'.red);
-    process.exit(1);
-  }
-  if (!gpgSigningKey.includes('-----BEGIN PGP PRIVATE KEY BLOCK-----')) {
-    d('Bad gpg key, no public key');
-    console.error('GPG key does not contain a private key, you must include both the public and private key in "config.gpgSigningKey"'.red);
-    process.exit(1);
-  }
-  d('Good gpg key');
-  d('Initializing public GPG key');
-  await store.putFile(
-    'public.key',
-    Buffer.from(gpgSigningKey.split('-----BEGIN PGP PRIVATE KEY BLOCK-----')[0]),
-    true,
-  );
-  d('GPG key now public at:', `${await store.getPublicBaseUrl()}/public.key`);
   d('registering migrations');
   await registerMigrations();
   d('migrations all registered');

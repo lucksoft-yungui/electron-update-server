@@ -21,7 +21,8 @@
     "start": "npm run start:server:prod",
     "start:fe": "webpack-dev-server --host 0.0.0.0 --progress --profile --colors --quiet --open",
     "start:server:dev": "nodemon --watch src --exec \"npm run build:server && cross-env DEBUG=nucleus* npm run start:server:prod\" -e ts",
-    "start:server:prod": "node lib/index.js",
+    "start:server": "node lib/index.js",
+    "start:server:prod": "concurrently --raw \"npm run start:server\" \"npm run start:static\"",
     "start:static": "make-dir ./data/.file && serve ./data/.file --port 9999 --silent",
     "test": "mocha --compilers ts:ts-node/register src/__spec__/rest.ts src/**/__spec__/*_spec.ts src/**/**/__spec__/*_spec.ts"
   },
