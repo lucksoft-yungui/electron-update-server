@@ -60,7 +60,8 @@
     "tedious": "^2.0.0",
     "to-ico": "^1.1.5",
     "concurrently": "^3.5.0",
-    "make-dir-cli": "^1.0.0"
+    "make-dir-cli": "^1.0.0",
+    "serve": "^6.1.0"
   },
   "devDependencies": {
     "@atlaskit/avatar": "^4.0.5",
