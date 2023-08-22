@@ -9,7 +9,7 @@ module.exports = {
   /**
    * The fully qualified domain + path that Nucleus is being hosted at
    */
-  baseURL: 'http://162.1.1.69:8888',
+  baseURL: 'http://127.0.0.1:8888',
 
   /**
    * The data store to use when persisting plugins and versions.Current possible values
@@ -53,7 +53,7 @@ module.exports = {
    */
   local: {
     root: path.resolve(__dirname, './data/.file'),
-    staticUrl: 'http://162.1.1.69:9999',
+    staticUrl: 'http://127.0.0.1:9999',
     port: 9999
   },
 
@@ -96,8 +96,8 @@ module.exports = {
    * photo: A URL for their profile, entirely optional, just makes things look nicer ;)
    */
   localAuth: [{
-    displayName: 'luckserver',
-    username: 'lucksoft',
+    displayName: 'admin',
+    username: 'admin',
     password: '123456',
     photo: 'https://pbs.twimg.com/profile_images/1219364727/charlie-support_400x400.png'
   }],
@@ -140,7 +140,7 @@ module.exports = {
   /**
    * See the documentation for your authentication strategy for what this array does
    */
-  adminIdentifiers: ['lucksoft'],
+  adminIdentifiers: ['admin'],
 
   /**
    * Session options, in development just leave this as default.

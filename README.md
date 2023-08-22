@@ -1,164 +1,124 @@
-# Nucleus Server
+# electron-update-server
 
-[![Build Status](https://travis-ci.org/atlassian/nucleus.svg?branch=enable-travis)](https://travis-ci.org/atlassian/nucleus) [![npm](https://img.shields.io/npm/v/nucleus-server.svg)](https://www.npmjs.com/package/nucleus-server) ![status](https://img.shields.io/badge/Status-%20Ready%20for%20Awesome-red.svg)
+本项目目标场景为私有云部署Electron应用更新服务器。
 
-A configurable and versatile update server for all your Electron apps
+这个项目是基于Atlassian's Nucleus进行修改和扩展的。感谢Atlassian团队为开源社区提供的出色工作。
 
-## Features
+# 修改和增强
 
-* Multiple applications
-* Multiple channels for each application
-* Companion publisher for [electron-forge](https://github.com/electron-userland/electron-forge) to greatly simplify release publishing
-* Backed by a static file store so minimal server costs
-* One command to run so insanely simple to set up
-* [Staged Rollouts](docs/Staged%20Rollouts.md)
-  * macOS
-  * Windows
-* [Latest Downloads](docs/Latest%20Releases.md) - Static URL's for downloading the latest version of your application
-* Platform Support:
-  * macOS
-  * Windows
-  * Linux - RedHat
-  * Linux - Debian
+- 支持linux（ubuntu）deb文件的上传、下载与版本管理
+- 支持arm64架构，包括darwin、win32、linux平台
+- 移除linux平台下yum、apt在线包管理，专注于私有化场景
 
-## Electron Version Requirements
+# 启动
 
-Please note that using Nucleus requires that you use Electron `>=2.0.0`.
+```
+docker run --name  update-server -v /home/ubuntu/app/update-server/data:/opt/service/data -v /home/ubuntu/app/update-server/config.js:/opt/service/config.js -p 3030:3030 -p 9999:9999 -d lucksoft/update-server:1.2.4
+```
+# 端口说明
 
-## Setup
+- 3030：管理、发布端及api服务端口
+- 9999：服务静态资源服务端口，用于应用的新版本检测、应用可执行文件下载等
 
-### Docker
+# 文件映射
 
-You'll need to set up your own docker image using a Dockefile like below.
+- `/opt/service/config.js`为配置文件的映射路径
+- 容器内部`/opt/service/data`的文件夹，存放着管理端的数据和各版本的静态文件，需要被映射出来，避免`docker`重启时数据丢失
 
-```docker
-FROM atlassian/nucleus
+# 配置文件
 
-COPY config.js /opt/service/config.js
+配置页面有以下关键配置项:
+
+- port，服务端口，默认3030
+- baseURL，后端管理的地址，只做显示用
+- local.staticUrl，静态服务器地址，会影响版本文件中的更新文件绝对地址
+- localAuth，管理后台用户列表
+- adminIdentifiers，管理员用户，默认来自`localAuth`中
+
+> 注：由于项目的版本信息文件都是后台动态生成的静态文件，所以项目默认利用`serve`组件起了一个静态服务器，默认端口9999（目前版本不可配置），用于版本的文件的访问和下载。可自行搭建自己的静态资源服务器，所有生成的资源文件都在`/opt/service/data`路径中。
+
+配置参考项目更目录下`config.template.js`文件。
+
+# 开发
+
+```
+git clone 
 ```
 
-Then running your built docker image will run nucleus on port 8080.
+# 管理界面
 
-### Manual
+默认访问地址[http://localhost:3030/](http://localhost:3030/)
 
-```bash
-git clone https://github.com/atlassian/nucleus.git nucleus-server
-cd nucleus-server
-cp config.template.js config.js
-yarn
-yarn dev
+
+## 发布应用
+
+### 应用创建
+
+在管理界面中创建好应用后，可以在应用详情界面看到`Token`、`channelId`、`appId`等属性。
+
+如图：
+
+![picture 1](assets/2fe62a569925dca99231d0bd11499c803dc3b93309f65aa5226820912f670505.png) 
+
+然后配置应用根目录下的`forge.config.js`文件：
+
+```
+const forgeConfig = {
+  // More config
+  publishers: [
+    {
+      name: '@electron-forge/publisher-nucleus',
+      config: {
+        host: 'http://localhost:3030',
+        appId: '1',
+        channelId: 'f41b4338993c33ca6f6177ff5254454d',
+        token: process.env.NUCLEUS_TOKEN // This should be set securely
+      }
+    }
+  ]
+  // More config
+};
 ```
 
-This will launch Nucleus running on your local machine with a local
-file store and a SQLite database.
+### 应用发布
 
-## Configuration
-
-All the config options are thoroughly documented and explained in the
-[config.template.js](config.template.js) file in this repository.
-
-## Uploading Releases
-
-Release uploading is explained inside Nucleus itself, for more advanced
-information check out the [Uploading Docs](docs/Uploading.md).
-
-## More Information
-
-Please see the following documents for more information on Nucleus and how it works.
-
-* [Internal Endpoints](docs/Endpoints.md)
-* [Uploading Releases](docs/Uploading.md)
-* [Architecture](docs/Architecture.md)
-* [Versioned Public API](docs/API.md)
-* [Staged Rollouts](docs/Staged%20Rollouts.md)
-* [Latest Releases](docs/Latest%20Releases.md)
-
-## FAQ
-
-### Why does this use a static file store, why not use a traditional update server?
-
-$$$, static file stores quite simply cost less to run than arrays of update servers
-
-### Can I use CloudFront to speed up my downloads?
-
-Yes, check out the CloudFront section of the S3 config inside [config.template.js](config.template.js).
-
-### How do I switch to this from Update Server X?
-
-Switching update servers in an Electron app is quite simple
-
-1. Modify your autoUpdater code to point to this server (follow the instructions
-on your app page inside Nucleus)
-2. Release a new update for your application on your existing update server with this change
-3. Release all future updates on Nucleus :)
-
-### Is this really awesome?
-
-Pretty sure it is :D
-
-### How do I set this up in a production environment?
-
-You can use the published version of this module `nucleus-server` which has
-an exported CLI command (`nucleus`).  You then run the command with the first
-argument being a path to your config file.  E.g.
-
-```bash
-NODE_ENV=production nucleus path/to/config.js
+```
+npm run publish -- --target @electron-forge/publisher-nucleus
 ```
 
-Please ensure you add redis session config and a proper (not local) authentication
-method when running in a production environment.
+如果只想生成预发布临时文件（只打包不上传），可使用如下命令：
 
-To enable logging you need to set `DEBUG=nucleus*`.
+```
+npm run publish -- --target @electron-forge/publisher-nucleus --dry-run
+```
 
-## System Requirements
+将预发布文件发布：
 
-* Node >= 8
-* Yarn
-* Linux
-  * `createrepo`
-  * `rpmsign`
-  * `dpkg-scanpackages`
-  * `dpkg-scansources`
-  * `gpg`
-  * `apt-ftparchive`
-* macOS / Windows
-  * `docker`
-  * `gpg`
+```
+npm run publish -- --target @electron-forge/publisher-nucleus --from-dry-run
+```
 
-## Contributors
+发布后的版本信息存储在`Draft`标签页，可以点击`Released`按钮生成正式版。
 
-Pull requests, issues and comments welcome. For pull requests:
+![picture 2](assets/c97e97f4318808c24d0290be262ac28d80e1194ef06abe3930baedcfe3b12e48.png)  
 
-* Add tests for new features and bug fixes
-* Follow the existing style
-* Separate unrelated changes into multiple pull requests
+![picture 3](assets/fc4da13554143103a15149db8b111a060e2edcf87bf49797b7ae02f89c646b47.png)  
 
-See the existing issues for things to start contributing.
+### 灰度发布
 
-For bigger changes, make sure you start a discussion first by creating
-an issue and explaining the intended change.
+可以在`Released`标签页中灰度发布某个应用，通过如下的按钮设置灰度发布的百分比：
 
-Atlassian requires contributors to sign a Contributor License Agreement,
-known as a CLA. This serves as a record stating that the contributor is
-entitled to contribute the code/documentation/translation to the project
-and is willing to have it used in distributions and derivative works
-(or is willing to transfer ownership).
+![picture 4](assets/1c1c6039576cc51d34738fdd29ba7f892e250cab519b67e2b9f28c55a90ed2c1.png)  
 
-Prior to accepting your contributions we ask that you please follow the appropriate
-link below to digitally sign the CLA. The Corporate CLA is for those who are
-contributing as a member of an organization and the individual CLA is for
-those contributing as an individual.
+## Api
 
-* [CLA for corporate contributors](https://na2.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=e1c17c66-ca4d-4aab-a953-2c231af4a20b)
-* [CLA for individuals](https://na2.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=3f94fbdc-2fbe-46ac-b14c-5d152700ae5d)
+### 获取应用版本信息
 
-## Team
+```
+http://localhost:9999/{appName}/versions.json
+```
 
-| [![Samuel Attard](https://s.gravatar.com/avatar/1576c987b53868acf73d6ccb08110a78?s=144)](https://samuelattard.com) |
-|---|
-| [Samuel Attard](https://samuelattard.com) |
+> 注：可以通过`file-serevr.js`添加更新Api功能
 
-## License
-
-Apache 2.0 © Atlassian Pty Ltd
+# 许可
+本项目遵循Apache License 2.0。你可以在LICENSE文件中找到完整的许可协议。
