@@ -185,7 +185,96 @@ Recommended file formats for upload:
 
 Below is a packaging configuration example based on `forge`:
 ```
-// [The rest of the code you provided]
+const path = require('path');
+const fs = require('fs-extra');
+const os = require('os');
+const config = require('./config/conf');
+const package = require('./package.json');
+
+// 打包日志记录
+const log = require("electron-log");
+log.transports.file.resolvePathFn = () => path.join(__dirname, 'logs/make.log');
+console.log = log.log;
+
+const getArchSuffix = () => {
+  const archIndex = process.argv.findIndex(arg => arg === '--arch');
+  if (archIndex !== -1 && process.argv[archIndex + 1]) {
+    return process.argv[archIndex + 1];
+  }
+  return '';
+};
+
+module.exports = {
+  packagerConfig: {
+    osxSign: {},
+    executableName: package.name,
+    asar: {
+      unpackDir: "{config,locales}"
+    },
+    icon: path.join(__dirname, './assets/icons/icon'), // no file extension required
+    ignore: [
+      "/config/publish.js",
+      "/out/",
+      "/.gitignore",
+      "/forge.config.js",
+    ]
+  },
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'lucksoft-yungui',
+          name: 'pc-client'
+        },
+        authToken: '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',
+        prerelease: true
+      }
+    },
+    {
+      name: '@electron-forge/publisher-nucleus',
+      config: {
+        host: config.autoUpdate.updateServer,
+        appId: config.autoUpdate.appId,
+        channelId: config.autoUpdate.channel,
+        token: process.env.NUCLEUS_TOKEN
+        // token: config.autoUpdate.token // This should be set securely
+      }
+    }
+  ],
+  rebuildConfig: {},
+  makers: [
+    {
+      name: '@electron-forge/maker-squirrel',
+      config: {
+        name: `${package.name}-${getArchSuffix()}`,
+        setupExe: `${package.name}-${package.version}-setup-${getArchSuffix()}.exe`,
+        iconUrl: path.join(__dirname, './assets/icons/icon.ico'),
+        setupIcon: path.join(__dirname, './assets/icons/icon.ico'),
+        certificateFile: './cert/win.pfx',
+        certificatePassword: process.env.WIN_CERTIFICATE_PASSWORD
+      }
+    },
+    {
+      name: '@electron-forge/maker-dmg',
+      config: {
+        name: `${package.name}-${package.version}-${getArchSuffix()}`,
+        icon: path.join(__dirname, './assets/icons/icon.icns'),
+      },
+    },
+    {
+      "name": "@electron-forge/maker-zip",
+      "platforms": ["darwin"]
+    },
+    {
+      name: '@electron-forge/maker-deb',
+      config: {
+        name: `${package.name}`,
+        icon: path.join(__dirname, './assets/icons/icon.png'),
+      },
+    }
+  ]
+}
 ```
 
 # API
