@@ -1,6 +1,6 @@
 # electron-update-server
 
-本项目目标场景为私有云部署Electron应用更新服务器。
+本项目旨在为私有云部署Electron应用的更新服务器。
 
 这个项目是基于[Atlassian's Nucleus](https://github.com/atlassian/nucleus)进行修改和扩展的。感谢Atlassian团队为开源社区提供的出色工作。
 
@@ -16,7 +16,7 @@
 
 - 支持更高版本的node
 - 支持arm架构
-- 支持当staticUrl发生变时，可以刷新相关的静态文件
+- 支持当staticUrl发生变化时刷新相关的静态文件
 
 # 启动
 
@@ -31,7 +31,7 @@ docker run --name  update-server -v /home/ubuntu/app/update-server/data:/opt/ser
 # 文件映射
 
 - `/opt/service/config.js`为配置文件的映射路径
-- 容器内部`/opt/service/data`的文件夹，存放着管理端的数据和各版本的静态文件，需要被映射出来，避免`docker`重启时数据丢失
+- 容器内部`/opt/service/data`的文件夹，存放着管理端的数据和各版本的静态文件，需要被映射出来，避免在`docker`重启时数据丢失
 
 # 配置文件
 
@@ -45,7 +45,7 @@ docker run --name  update-server -v /home/ubuntu/app/update-server/data:/opt/ser
 
 > 注：由于项目的版本信息文件都是后台动态生成的静态文件，所以项目默认利用`serve`组件起了一个静态服务器，默认端口9999（目前版本不可配置），用于版本的文件的访问和下载。可自行搭建自己的静态资源服务器，所有生成的资源文件都在`/opt/service/data/.file`文件夹中。
 
-配置参考项目更目录下`config.template.js`文件。
+配置参考项目根目录下`config.template.js`文件。
 
 # 静态目录结构
 
@@ -177,13 +177,13 @@ const checkUpdateUrl = `${domain}/${appName}/${channel}/${process.platform}/${pr
 
 # 上传文件约定
 
-推荐以下上传文件格式
+推荐使用以下的文件格式上传
 
 - darwin：dmg（用于首次安装）、zip（用于自动更新）
 - win32：exe（用于首次安装）、nupkg（用于自动更新）
 - linux: deb (用于首次安装和自动更新)
 
-> 注：darwin和win32上传的文件需要签名才能实现自动更新，win32可以使用自签名证书进行签名。linux应为实质为用户手动安装更新，所以无需强制签名。
+> 注：darwin和win32上传的文件需要签名才能实现自动更新，win32可以使用自签名证书进行签名。linux的更新实质上需要用户手动安装，所以无需强制签名。
 
 以下是一个基于`forge`的打包配置示例：
 ```
