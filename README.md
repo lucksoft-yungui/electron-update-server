@@ -146,6 +146,9 @@ To publish the pre-release files:
 npm run publish -- --target @electron-forge/publisher-nucleus --from-dry-run --arch arm64
 ```
 
+Additionally, you can use the batch release tool [electron-update-server-uploader](https://github.com/lucksoft-yungui/electron-update-server-uploader) for multi-platform and multi-architecture version deployment.
+
+
 After publishing, version information is stored on the `Draft` tab, and you can click the `Released` button to generate the official version.
 
 ![picture 2](assets/c97e97f4318808c24d0290be262ac28d80e1194ef06abe3930baedcfe3b12e48.png)  

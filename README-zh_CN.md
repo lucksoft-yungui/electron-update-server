@@ -148,6 +148,8 @@ npm run publish -- --target @electron-forge/publisher-nucleus --dry-run --arch a
 npm run publish -- --target @electron-forge/publisher-nucleus --from-dry-run --arch arm64
 ```
 
+另外，可以利用批量发布工具[electron-update-server-uploader](https://github.com/lucksoft-yungui/electron-update-server-uploader)进行多平台、多架构版本发包。
+
 发布后的版本信息存储在`Draft`标签页，可以点击`Released`按钮生成正式版。
 
 ![picture 2](assets/c97e97f4318808c24d0290be262ac28d80e1194ef06abe3930baedcfe3b12e48.png)  
