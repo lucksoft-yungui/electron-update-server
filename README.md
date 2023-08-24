@@ -155,7 +155,7 @@ After publishing, version information is stored on the `Draft` tab, and you can 
 
 ![picture 3](assets/fc4da13554143103a15149db8b111a060e2edcf87bf49797b7ae02f89c646b47.png)  
 
-## Staged Release (Beta Testing)
+## Staged Release
 
 On the `Released` tab, you can set up a staged release for an application. Set the percentage for staged release using the button shown below:
 
